@@ -38,6 +38,21 @@ async function run() {
             res.send(product)
         });
 
+        app.put('/parts/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedUser = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    stock: updatedUser.stock
+                }
+            }
+            const result = await partCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
+
+
     
   } finally {
   }
