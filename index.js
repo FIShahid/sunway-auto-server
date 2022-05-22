@@ -22,8 +22,13 @@ async function run() {
   try {
     await client.connect();
     console.log('Mongodb Connected');
-   
+   const partCollection = client.db('sunWay-autoParts').collection('parts')
      
+   app.get('/parts' , async(req,res)=>{
+       const query ={};
+       const cursor = await partCollection.find(query).toArray()
+       res.send(cursor);
+   } )
     
   } finally {
   }
