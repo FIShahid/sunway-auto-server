@@ -22,38 +22,71 @@ async function run() {
   try {
     await client.connect();
     console.log('Mongodb Connected');
-   const partCollection = client.db('sunWay-autoParts').collection('parts')
-     
-   app.get('/parts' , async(req,res)=>{
-       const query ={};
-       const cursor = await partCollection.find(query).toArray()
-       res.send(cursor);
-   } )
+    const partCollection = client.db('sunWay-autoParts').collection('parts')
+    const orderCollection = client.db('sunWay-autoParts').collection('order')
+
+    app.get('/parts', async (req, res) => {
+      const query = {};
+      const cursor = await partCollection.find(query).toArray()
+      res.send(cursor);
+    })
 
 
     app.get('/parts/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) }
-            const product = await partCollection.findOne(query);
-            res.send(product)
-        });
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const product = await partCollection.findOne(query);
+      res.send(product)
+    });
 
-        app.put('/parts/:id', async (req, res) => {
-            const id = req.params.id;
-            const updatedUser = req.body;
-            const filter = { _id: ObjectId(id) };
-            const options = { upsert: true }
-            const updatedDoc = {
-                $set: {
-                    stock: updatedUser.stock
-                }
-            }
-            const result = await partCollection.updateOne(filter, updatedDoc, options);
-            res.send(result);
-        })
+    app.put('/parts/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedUser = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true }
+      const updatedDoc = {
+        $set: {
+          stock: updatedUser.stock
+        }
+      }
+      const result = await partCollection.updateOne(filter, updatedDoc, options);
+      res.send(result);
+    })
+
+    app.post('/order',  async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
+    });
+
+  //------------------------//
+//   app.get('/parts/:id', async (req, res) => {
+//     const id = req.params.id;
+//     const query = { _id: ObjectId(id) };
+//     const parts = await partCollection.findOne(query);
+//     res.send(parts)
+// })
+
+app.post('/orders', async (req, res) => {
+
+    const orders = req.body;
+    const result = await orderCollection.insertOne(orders);
+    res.send(result)
+})
+
+// getting all orders according to individual email address 
+app.get('/orders', async (req, res) => {
+
+    const email = req.query.email
+    const query = { email: email }
+    const cursor = orderCollection.find(query)
+    const myOrders = await cursor.toArray()
+    res.send(myOrders);
+})
 
 
-    
+
+
   } finally {
   }
 }
@@ -65,5 +98,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log('To-Do Server Running on Port..' ,port);
+  console.log('To-Do Server Running on Port..', port);
 });
