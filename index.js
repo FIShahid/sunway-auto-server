@@ -53,36 +53,42 @@ async function run() {
       res.send(result);
     })
 
-    app.post('/order',  async (req, res) => {
+
+    // getting all orders according to individual email address 
+    app.get('/order', async (req, res) => {
+
+      const email = req.query.userEmail
+      const query = { email: email }
+      const cursor = orderCollection.find(query)
+      const myOrders = await cursor.toArray()
+      res.send(myOrders);
+    })
+
+
+
+    //Post  Order Information
+    app.post('/order', async (req, res) => {
       const order = req.body;
+
       const result = await orderCollection.insertOne(order);
       res.send(result);
     });
 
-  //------------------------//
-//   app.get('/parts/:id', async (req, res) => {
-//     const id = req.params.id;
-//     const query = { _id: ObjectId(id) };
-//     const parts = await partCollection.findOne(query);
-//     res.send(parts)
-// })
+    //------------------------//
+    //   app.get('/parts/:id', async (req, res) => {
+    //     const id = req.params.id;
+    //     const query = { _id: ObjectId(id) };
+    //     const parts = await partCollection.findOne(query);
+    //     res.send(parts)
+    // })
 
-app.post('/orders', async (req, res) => {
+    app.post('/orders', async (req, res) => {
 
-    const orders = req.body;
-    const result = await orderCollection.insertOne(orders);
-    res.send(result)
-})
+      const orders = req.body;
+      const result = await orderCollection.insertOne(orders);
+      res.send(result)
+    })
 
-// getting all orders according to individual email address 
-app.get('/orders', async (req, res) => {
-
-    const email = req.query.email
-    const query = { email: email }
-    const cursor = orderCollection.find(query)
-    const myOrders = await cursor.toArray()
-    res.send(myOrders);
-})
 
 
 
