@@ -24,6 +24,8 @@ async function run() {
     console.log('Mongodb Connected');
     const partCollection = client.db('sunWay-autoParts').collection('parts')
     const orderCollection = client.db('sunWay-autoParts').collection('order')
+    const reviewCollection = client.db('sunWay-autoParts').collection('review')
+
 
     app.get('/parts', async (req, res) => {
       const query = {};
@@ -74,19 +76,29 @@ async function run() {
       res.send(result);
     });
 
-    //------------------------//
-    //   app.get('/parts/:id', async (req, res) => {
-    //     const id = req.params.id;
-    //     const query = { _id: ObjectId(id) };
-    //     const parts = await partCollection.findOne(query);
-    //     res.send(parts)
-    // })
-
+  
     app.post('/orders', async (req, res) => {
 
       const orders = req.body;
       const result = await orderCollection.insertOne(orders);
       res.send(result)
+    })
+
+//Get Review 
+
+app.get('/review', async (req, res) => {
+  const query = {};
+  const cursor = await reviewCollection.find(query).toArray()
+  res.send(cursor);
+})
+
+
+    //Post Review
+
+    app.post('/review' , async (req, res) => {
+      const newReview = req.body;
+      const result = await reviewCollection.insertOne(newReview);
+      res.send(result);
     })
 
 
