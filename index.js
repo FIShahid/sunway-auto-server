@@ -25,6 +25,23 @@ async function run() {
     const partCollection = client.db('sunWay-autoParts').collection('parts')
     const orderCollection = client.db('sunWay-autoParts').collection('order')
     const reviewCollection = client.db('sunWay-autoParts').collection('review')
+    const userCollection = client.db('sunWay-autoParts').collection('users')
+
+    //User collection
+
+    app.put('/user/:email', async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updatedDoc, options);
+      res.send(result);
+
+    })
+
 
 
     app.get('/parts', async (req, res) => {
@@ -76,7 +93,7 @@ async function run() {
       res.send(result);
     });
 
-  
+
     app.post('/orders', async (req, res) => {
 
       const orders = req.body;
@@ -84,18 +101,18 @@ async function run() {
       res.send(result)
     })
 
-//Get Review 
+    //Get Review 
 
-app.get('/review', async (req, res) => {
-  const query = {};
-  const cursor = await reviewCollection.find(query).toArray()
-  res.send(cursor);
-})
+    app.get('/review', async (req, res) => {
+      const query = {};
+      const cursor = await reviewCollection.find(query).toArray()
+      res.send(cursor);
+    })
 
 
     //Post Review
 
-    app.post('/review' , async (req, res) => {
+    app.post('/review', async (req, res) => {
       const newReview = req.body;
       const result = await reviewCollection.insertOne(newReview);
       res.send(result);
