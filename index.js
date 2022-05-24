@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-
+const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -26,20 +26,22 @@ async function run() {
     const orderCollection = client.db('sunWay-autoParts').collection('order')
     const reviewCollection = client.db('sunWay-autoParts').collection('review')
     const userCollection = client.db('sunWay-autoParts').collection('users')
+    const profileCollection = client.db('sunWay-autoParts').collection('profile')
 
     //User collection
 
     app.put('/user/:email', async (req, res) => {
       const email = req.params.email;
+     console.log(email);
       const user = req.body;
       const filter = { email: email };
       const options = { upsert: true };
-      const updatedDoc = {
+      const updateDoc = {
         $set: user,
       };
-      const result = await userCollection.updateOne(filter, updatedDoc, options);
-      res.send(result);
-
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+      res.send({ result ,token });
     })
 
 
@@ -76,12 +78,14 @@ async function run() {
     // getting all orders according to individual email address 
     app.get('/order', async (req, res) => {
 
-      const email = req.query.userEmail
-      const query = { email: email }
+      const email = req.query.email
+      const query = { userEmail: email }
       const cursor = orderCollection.find(query)
       const myOrders = await cursor.toArray()
       res.send(myOrders);
     })
+
+    
 
 
 
@@ -118,7 +122,19 @@ async function run() {
       res.send(result);
     })
 
+//Profile page
 
+app.post('/profile', async (req, res) => {
+  const orders = req.body;
+  console.log(orders.email);
+  const query = { email: orders.email };
+  const exists = await profileCollection.findOne(query);
+  if (exists) {
+    return res.send({ success: false, user: exists })
+  }
+  const result = await profileCollection.insertOne(orders);
+  res.send(result)
+})
 
 
 
