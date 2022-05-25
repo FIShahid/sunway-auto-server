@@ -148,18 +148,23 @@ async function run() {
       res.send(result);
     })
     /////Manage Product
-    app.get('/parts',  async (req, res) => {
+    app.get('/parts', verifyJWT  , async (req, res) => {
       const product = await partCollection.find().toArray()
      
       res.send(product);
     })
-    app.delete('/products/:email',  async (req, res)=>{
-      const email  = req.params.email;
-      const filter = { email: email};
-      const result = await partCollection.delete(filter);
+    // app.delete('/parts/:email', verifyJWT, async (req, res)=>{
+    //   const email  = req.params.email;
+    //   const filter = { email: email};
+    //   const result = await partCollection.delete(filter);
+    //   res.send(result);
+    // })
+    app.delete('/parts/:id',verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await partCollection.deleteOne(query);
       res.send(result);
-    })
-
+  });
 
     // getting all orders according to individual email address 
     app.get('/order', async (req, res) => {
