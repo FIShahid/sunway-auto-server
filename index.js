@@ -44,6 +44,20 @@ async function run() {
     const userCollection = client.db('sunWay-autoParts').collection('users')
     const profileCollection = client.db('sunWay-autoParts').collection('profile')
 
+
+    ///Admin function for
+    const verifyAdmin = async (req, res, next) => {
+      const requester = req.decoded.email;
+      const requesterAccount = await userCollection.findOne({ email: requester });
+      if (requesterAccount.role === 'admin') {
+        next();
+      }
+      else {
+        res.status(403).send({ message: 'forbidden' });
+      }
+    }
+
+
     //User collection
 
     
@@ -101,13 +115,13 @@ async function run() {
 
     app.get('/parts', async (req, res) => {
       const query = {};
-      const cursor = await partCollection.find(query).toArray()
+      const cursor = await (await partCollection.find(query).toArray()).reverse();
       res.send(cursor);
     })
 
     ///Add Product to Database
 
-    app.post('/parts', async (req, res) => {
+    app.post('/parts',  async (req, res) => {
       const parts = req.body;
       const result = await partCollection.insertOne(parts);
       res.send(result);
@@ -131,6 +145,18 @@ async function run() {
         }
       }
       const result = await partCollection.updateOne(filter, updatedDoc, options);
+      res.send(result);
+    })
+    /////Manage Product
+    app.get('/parts',  async (req, res) => {
+      const product = await partCollection.find().toArray()
+     
+      res.send(product);
+    })
+    app.delete('/products/:email',  async (req, res)=>{
+      const email  = req.params.email;
+      const filter = { email: email};
+      const result = await partCollection.delete(filter);
       res.send(result);
     })
 
