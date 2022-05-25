@@ -105,6 +105,13 @@ async function run() {
       res.send(cursor);
     })
 
+    ///Add Product to Database
+
+    app.post('/parts', async (req, res) => {
+      const parts = req.body;
+      const result = await partCollection.insertOne(parts);
+      res.send(result);
+    })
 
     app.get('/parts/:id', async (req, res) => {
       const id = req.params.id;
