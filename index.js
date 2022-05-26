@@ -225,7 +225,11 @@ app.patch('/order/:id', async (req, res) => {
     })
 
     
-
+    app.get('/orders/order', async (req, res) => {
+      const query = {};
+      const cursor = await orderCollection.find(query).toArray()
+      res.send(cursor);
+    })
 
 
     //Post  Order Information
