@@ -45,6 +45,7 @@ async function run() {
     const reviewCollection = client.db('sunWay-autoParts').collection('review')
     const userCollection = client.db('sunWay-autoParts').collection('users')
     const profileCollection = client.db('sunWay-autoParts').collection('profile')
+    const paymentCollection = client.db('sunWay-autoParts').collection('payment')
 
 
     ///Admin function for
@@ -331,6 +332,14 @@ app.get('/order/:id', async(req, res) =>{
   res.send(order);
 })
 
+///Deleteing Order Api
+
+app.delete('/order/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: ObjectId(id) };
+  const result = await orderCollection.deleteOne(query);
+  res.send(result);
+});
 
 
 
